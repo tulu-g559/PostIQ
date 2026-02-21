@@ -1,0 +1,17 @@
+
+{
+  "placeholderImages": [
+    {
+      "id": "hero-bg",
+      "description": "Abstract technological background",
+      "imageUrl": "https://picsum.photos/seed/postiq-hero/1200/800",
+      "imageHint": "abstract tech"
+    },
+    {
+      "id": "avatar-1",
+      "description": "User avatar placeholder",
+      "imageUrl": "https://picsum.photos/seed/user1/100/100",
+      "imageHint": "person portrait"
+    }
+  ]
+}
