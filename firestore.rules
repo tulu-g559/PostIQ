@@ -1,0 +1,92 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * PostIQ Security Rules
+     * 
+     * Core Philosophy:
+     * This ruleset enforces a strict user-ownership model for personal data (profiles and posts) 
+     * while allowing public access to competitive data (leaderboards). It prioritizes 
+     * authorization independence by using path-based wildcards and denormalized ownership 
+     * fields within documents.
+     * 
+     * Data Structure:
+     * - /users/{userId}: Root collection for user profiles, where document ID matches Auth UID.
+     * - /users/{userId}/posts/{postId}: Subcollection for user posts, ensuring natural data 
+     *   scoping and ownership.
+     * - /leaderboard_entries/{entryId}: Top-level collection for public leaderboard data.
+     * 
+     * Key Security Decisions:
+     * 1. Authorization Independence: Every post document contains a 'userId' field that 
+     *    matches the path wildcard, allowing for fast, single-document security checks.
+     * 2. Restricted Writes: Leaderboard entries are intended to be managed by secure 
+     *    backend processes (Cloud Functions), so client-side writes are disabled.
+     * 3. Public Readability: The leaderboard is globally readable to facilitate 
+     *    community engagement without requiring complex lookup rules.
+     * 4. Relational Integrity: On creation, documents must contain an internal ID 
+     *    field that matches the path UID to prevent "spoofing" or orphaned data.
+     */
+
+    // --- Global Helper Functions ---
+
+    /** @description Checks if the request is from a signed-in user. */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /** @description Checks if the authenticated user's UID matches the provided userId. */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /** @description Combines ownership check with a check that the resource actually exists for updates/deletes. */
+    function isExistingOwner(userId) {
+      return resource != null && isOwner(userId);
+    }
+
+    // --- Collection Rules ---
+
+    /**
+     * @description Rules for the UserProfile entity. Users manage their own profiles.
+     * @path /users/{userId}
+     * @allow (get) Signed-in user reads their own profile.
+     * @deny (list) Listing all users is prohibited to protect privacy.
+     * @principle Path-based ownership with relational integrity validation for the 'id' field.
+     */
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if false;
+      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
+      allow delete: if isExistingOwner(userId);
+
+      /**
+       * @description Rules for the Post entity. Nested under the owner's user path.
+       * @path /users/{userId}/posts/{postId}
+       * @allow (create) User creates a post within their own subcollection.
+       * @deny (update) User attempts to change the 'userId' field of an existing post.
+       * @principle Hierarchical ownership reinforced by denormalized 'userId' field.
+       */
+      match /posts/{postId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId) && request.resource.data.userId == userId;
+        allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
+        allow delete: if isExistingOwner(userId);
+      }
+    }
+
+    /**
+     * @description Rules for the LeaderboardEntry entity. Designed for public consumption.
+     * @path /leaderboard_entries/{leaderboardEntryId}
+     * @allow (list) Any user (even unauthenticated) can view the leaderboard.
+     * @deny (create, update, delete) Clients cannot modify leaderboard data directly.
+     * @principle Server-side write restriction to ensure fairness and data integrity.
+     */
+    match /leaderboard_entries/{leaderboardEntryId} {
+      allow get, list: if true;
+      allow create, update, delete: if false; 
+      // Note: Admin SDK/Cloud Functions bypass these rules to manage the leaderboard.
+    }
+  }
+}

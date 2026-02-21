@@ -1,0 +1,240 @@
+{
+  "entities": {
+    "UserProfile": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "UserProfile",
+      "type": "object",
+      "description": "Represents a user's profile information within the PostIQ application. This entity stores public and application-specific user details, referencing an external authentication system for secure login.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the UserProfile entity."
+        },
+        "authId": {
+          "type": "string",
+          "description": "Unique ID from the external authentication system (e.g., Firebase Auth UID). This links the UserProfile to the authenticated user. (Relationship: ExternalAuth 1:1 UserProfile)"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "The user's public display name, visible on the dashboard and leaderboard."
+        },
+        "email": {
+          "type": "string",
+          "description": "The user's primary email address.",
+          "format": "email"
+        },
+        "photoUrl": {
+          "type": "string",
+          "description": "URL to the user's profile picture or avatar.",
+          "format": "uri"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the user profile was first created.",
+          "format": "date-time"
+        },
+        "lastLoginAt": {
+          "type": "string",
+          "description": "Timestamp indicating the user's last login time.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "authId",
+        "displayName",
+        "email",
+        "createdAt",
+        "lastLoginAt"
+      ]
+    },
+    "Post": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Post",
+      "type": "object",
+      "description": "Stores a user's original post, its comprehensive AI analysis results, engagement scores, and AI-generated optimized versions.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Post entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the UserProfile who created this post. (Relationship: UserProfile 1:N Post)"
+        },
+        "originalText": {
+          "type": "string",
+          "description": "The original text content submitted by the user for analysis. It must be between 10 and 500 characters long."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the post was initially created and submitted.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp indicating the last time the post's analysis or data was updated.",
+          "format": "date-time"
+        },
+        "analysisStatus": {
+          "type": "string",
+          "description": "The current status of the post analysis process (e.g., 'pending', 'completed', 'failed')."
+        },
+        "engagementScore": {
+          "type": "number",
+          "description": "The overall weighted engagement score calculated by the Gemini API, rounded to the nearest integer (0-100)."
+        },
+        "hookStrength": {
+          "type": "number",
+          "description": "A component score (0-100) reflecting the effectiveness of the post's opening to grab attention."
+        },
+        "emotionalIntensity": {
+          "type": "number",
+          "description": "A component score (0-100) representing the emotional impact and depth of the post's content."
+        },
+        "clarity": {
+          "type": "number",
+          "description": "A component score (0-100) indicating how clear, concise, and easy to understand the post is."
+        },
+        "novelty": {
+          "type": "number",
+          "description": "A component score (0-100) reflecting the originality and unique perspective presented in the post."
+        },
+        "emotionalTone": {
+          "type": "string",
+          "description": "A categorization of the predominant emotional tone detected in the post (e.g., 'positive', 'neutral', 'negative', 'informative', 'inspirational')."
+        },
+        "viralityFactors": {
+          "type": "array",
+          "description": "A list of keywords or phrases indicating factors that could contribute to the post's virality (e.g., 'controversy', 'humor', 'inspiration').",
+          "items": {
+            "type": "string"
+          }
+        },
+        "optimizedRewrites": {
+          "type": "array",
+          "description": "An array containing two AI-generated improved versions of the original post, designed for higher engagement.",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "originalText",
+        "createdAt",
+        "updatedAt",
+        "analysisStatus",
+        "engagementScore",
+        "hookStrength",
+        "emotionalIntensity",
+        "clarity",
+        "novelty",
+        "emotionalTone",
+        "viralityFactors",
+        "optimizedRewrites"
+      ]
+    },
+    "LeaderboardEntry": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "LeaderboardEntry",
+      "type": "object",
+      "description": "Represents a single entry on the application's leaderboard, capturing a user's highest post score for a specific day.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the LeaderboardEntry entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the UserProfile who achieved this score. (Relationship: UserProfile 1:N LeaderboardEntry)"
+        },
+        "postId": {
+          "type": "string",
+          "description": "Reference to the Post that generated this leaderboard score. (Relationship: Post 1:1 LeaderboardEntry)"
+        },
+        "score": {
+          "type": "number",
+          "description": "The engagement score of the post that made it to the leaderboard."
+        },
+        "entryDate": {
+          "type": "string",
+          "description": "The calendar date (YYYY-MM-DD) for which this entry is valid, used to enforce daily limits on leaderboard submissions.",
+          "format": "date"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when this leaderboard entry was recorded.",
+          "format": "date-time"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Denormalized user display name from UserProfile for public leaderboard display, ensuring readability even if the original profile is modified or restricted."
+        },
+        "photoUrl": {
+          "type": "string",
+          "description": "Denormalized URL to the user's profile picture from UserProfile for public leaderboard display.",
+          "format": "uri"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "postId",
+        "score",
+        "entryDate",
+        "createdAt",
+        "displayName",
+        "photoUrl"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "UserProfile",
+          "schema": {
+            "$ref": "#/backend/entities/UserProfile"
+          },
+          "description": "Stores individual user profiles. The document ID '{userId}' is the Firebase Auth UID. Authorization is path-based and ensures users can only access their own profile. Includes denormalized 'id' and 'authId' fields for authorization independence."
+        }
+      },
+      {
+        "path": "/users/{userId}/posts/{postId}",
+        "definition": {
+          "entityName": "Post",
+          "schema": {
+            "$ref": "#/backend/entities/Post"
+          },
+          "description": "Stores individual posts created by a user. Nested under the user's profile to enforce ownership. The document includes a 'userId' field that explicitly matches the parent '{userId}' for authorization independence, eliminating the need for 'get()' operations in security rules to check parent ownership."
+        }
+      },
+      {
+        "path": "/leaderboard_entries/{leaderboardEntryId}",
+        "definition": {
+          "entityName": "LeaderboardEntry",
+          "schema": {
+            "$ref": "#/backend/entities/LeaderboardEntry"
+          },
+          "description": "Stores publicly readable leaderboard entries, with each entry representing a user's highest score for a given day. Includes denormalized 'displayName' and 'photoUrl' from UserProfile for public display, ensuring authorization independence for reads. Write access is restricted to Cloud Functions for fairness enforcement.",
+          "params": [
+            {
+              "name": "leaderboardEntryId",
+              "description": "The unique identifier for a specific leaderboard entry."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore data structure is designed to adhere strictly to the core design principles and strategy mandates, prioritizing authorization independence, clear intent, and secure list operations (QAPs). \n\n1.  **User Profiles (`/users/{userId}`):** User profile data is stored in a top-level collection `users`. Each user's profile document ID (`{userId}`) will directly correspond to their Firebase Authentication UID. This structure provides immediate authorization independence as security rules can directly compare `request.auth.uid` with the `{userId}` wildcard in the path and the `id` or `authId` field within the document. This ensures that users can only read or modify their own profiles without needing complex `get()` operations.\n\n2.  **User Posts (`/users/{userId}/posts/{postId}`):** User posts are stored as a subcollection under their respective user profiles. This hierarchical path (`/users/{userId}/posts`) ensures strong ownership. \n    *   **Authorization Independence:** Each `Post` document inherently contains a `userId` field that matches the parent `{userId}` in the path. This denormalization means that security rules for posts can authorize access based solely on `request.auth.uid == userId` (from the path wildcard) and `request.auth.uid == resource.data.userId` (from the document's own data). There is no need for `get()` calls to a parent document to determine ownership, making rules atomic, simpler, and less prone to errors.\n    *   **QAPs (Query as a Security Principle):** By nesting posts under a specific user's path, `list` operations on posts are naturally scoped. A user can only query for posts within their own `/users/{userId}/posts` subcollection, preventing unauthorized users from listing all posts across the application. This ensures that rules are not used as filters, but rather enforce access on already scoped data.\n\n3.  **Leaderboard Entries (`/leaderboard_entries/{leaderboardEntryId}`):** Leaderboard entries are placed in a top-level collection `leaderboard_entries`. This collection is designed for public readability, but with server-side write access (via Cloud Functions) to enforce fairness logic and daily limits.\n    *   **Authorization Independence:** The `LeaderboardEntry` document explicitly denormalizes `displayName` and `photoUrl` from the `UserProfile`. This is critical for public display, as it means public users (or unauthenticated users, if allowed) can read the leaderboard entries and see associated user information without performing `get()` requests on individual `UserProfile` documents. This keeps the leaderboard highly performant and secure for its public read purpose.\n    *   **QAPs (Query as a Security Principle):** As this collection is intended to be publicly readable, `list` operations are permitted for all. Queries on this collection might filter by date or score, but the data itself is intended for broad access. Write operations are restricted to trusted server processes, aligning with the principle of separating public read collections from private write logic."
+  }
+}
