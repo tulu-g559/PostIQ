@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from "react";
@@ -6,6 +5,7 @@ import { NavBar } from "@/components/layout/nav-bar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { getLeaderboard } from "@/app/lib/actions";
 import { Trophy, Medal, Star, User, Flame, TrendingUp } from "lucide-react";
 
