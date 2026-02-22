@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from "react";
@@ -8,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getLeaderboard } from "@/app/lib/actions";
 import { Trophy, Medal, Star, User, Flame, TrendingUp } from "lucide-react";
+import Link from "next/link";
 
 export default function LeaderboardPage() {
   const [entries, setEntries] = useState<any[]>([]);
@@ -90,7 +92,9 @@ export default function LeaderboardPage() {
             <TrendingUp className="h-5 w-5" /> Want to see your name here?
           </h2>
           <p className="text-muted-foreground mb-4 max-w-md mx-auto">Analyze your posts and aim for the top. Leaderboard entries are limited to 1 per user per day to ensure fairness.</p>
-          <Button asChild><a href="/">Go to Dashboard</a></Button>
+          <Button asChild>
+            <Link href="/dashboard">Go to Dashboard</Link>
+          </Button>
         </div>
       </main>
     </div>

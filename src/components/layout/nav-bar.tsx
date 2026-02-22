@@ -3,8 +3,8 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { usePathname } from "next/navigation";
-import { LayoutDashboard, History, Trophy, LogOut, User } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { LayoutDashboard, Trophy, LogOut, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { auth } from "@/lib/firebase";
@@ -13,6 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export function NavBar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [user, setUser] = useState<FirebaseUser | null>(null);
 
   useEffect(() => {
@@ -24,10 +25,11 @@ export function NavBar() {
 
   const handleLogout = async () => {
     await signOut(auth);
+    router.push("/");
   };
 
   const navItems = [
-    { label: "Dashboard", href: "/", icon: LayoutDashboard },
+    { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     { label: "Leaderboard", href: "/leaderboard", icon: Trophy },
   ];
 
