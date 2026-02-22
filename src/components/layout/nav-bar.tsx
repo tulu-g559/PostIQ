@@ -28,7 +28,6 @@ export function NavBar() {
 
   const navItems = [
     { label: "Dashboard", href: "/", icon: LayoutDashboard },
-    { label: "History", href: "/history", icon: History },
     { label: "Leaderboard", href: "/leaderboard", icon: Trophy },
   ];
 

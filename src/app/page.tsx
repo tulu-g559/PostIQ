@@ -40,7 +40,7 @@ export default function Home() {
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      if (isRegistering) {
+      if (isRegistering) {  
         await createUserWithEmailAndPassword(auth, email, password);
       } else {
         await signInWithEmailAndPassword(auth, email, password);

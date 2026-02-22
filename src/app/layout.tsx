@@ -4,7 +4,7 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
-  title: 'PostIQ | Master Your Social Reach',
+  title: 'PostIQ',
   description: 'AI-powered social media post analysis and optimization.',
 };
 

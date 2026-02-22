@@ -1,7 +1,34 @@
+import * as admin from 'firebase-admin';
+import serviceAccount from '@/firebase/postiq-adminsdk.json';
 
-// This is a placeholder since we don't have firebase-admin npm package.
-// In a real environment, you would use firebase-admin to bypass client-side limits.
-// For the context of this scaffolding, we use the client SDK with server actions.
-// If actual Firebase Admin is required, it must be installed in package.json.
-// However, the client SDK works fine in Next.js Server Actions if initialized correctly.
-export {};
+let adminApp: admin.app.App;
+
+export function initializeAdmin() {
+  if (admin.apps.length > 0) {
+    return admin.app();
+  }
+
+  adminApp = admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
+  });
+
+  return adminApp;
+}
+
+/**
+ * Get the Firestore Admin instance.
+ */
+export function getAdminFirestore() {
+  const app = initializeAdmin();
+  return admin.firestore(app);
+}
+
+/**
+ * Get the Auth Admin instance.
+ */
+export function getAdminAuth() {
+  const app = initializeAdmin();
+  return admin.auth(app);
+}
+
+export { admin };
